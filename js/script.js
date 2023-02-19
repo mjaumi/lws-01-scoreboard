@@ -3,6 +3,9 @@ const singleScoreEl = document.querySelectorAll('.lws-singleResult');
 const incrementFormEl = document.querySelectorAll('.incrementForm');
 const decrementFormEl = document.querySelectorAll('.decrementForm');
 
+const matchContainerEl = document.getElementById('matchContainer');
+const addAnotherMatchBtn = document.getElementById('addNewMatch');
+
 // action identifiers
 const INCREMENT = 'increment';
 const DECREMENT = 'decrement';
@@ -94,4 +97,34 @@ decrementFormEl[0].addEventListener('submit', (e) => {
     e.preventDefault();
     store.dispatch(decrement(parseInt(e.target.decrement.value)));
     e.target.reset();
+});
+
+// adding new match here
+addAnotherMatchBtn.addEventListener('click', () => {
+    const newMatchDiv = document.createElement('div');
+    newMatchDiv.classList.add('match');
+    newMatchDiv.innerHTML = `
+        <div class="wrapper">
+            <button class="lws-delete">
+              <img src="./image/delete.svg" alt="" />
+            </button>
+            <h3 class="lws-matchName">Match 1</h3>
+          </div>
+          <div class="inc-dec">
+            <form class="incrementForm">
+              <h4>Increment</h4>
+              <input type="number" name="increment" class="lws-increment" />
+            </form>
+            <form class="decrementForm">
+              <h4>Decrement</h4>
+              <input type="number" name="decrement" class="lws-decrement" />
+            </form>
+          </div>
+          <div class="numbers">
+            <h2 class="lws-singleResult">120</h2>
+          </div>
+        </div>
+    `;
+
+    matchContainerEl.appendChild(newMatchDiv);
 });

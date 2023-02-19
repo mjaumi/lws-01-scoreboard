@@ -13,22 +13,38 @@ const INSERT = 'insert';
 
 let matchCounter;
 
+// this function is adding eventlistener to form elements
+const addFormEventListener = (index, element, incOrDec) => {
+    element.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        //console.log(index, e.target.increment.value);
+
+        if (incOrDec === INCREMENT) {
+            store.dispatch(increment(index, parseInt(e.target.increment.value)));
+        } else {
+            store.dispatch(decrement(index, parseInt(e.target.decrement.value)));
+        }
+        e.target.reset();
+    });
+}
+
 // action creators
-const increment = (value) => {
+const increment = (id, value) => {
     return {
         type: INCREMENT,
         payload: {
-            id: 1,
+            id,
             value
         }
     };
 }
 
-const decrement = (value) => {
+const decrement = (id, value) => {
     return {
         type: DECREMENT,
         payload: {
-            id: 1,
+            id,
             value
         }
     };
@@ -52,12 +68,14 @@ const initialState = [
 function scoreReducer(state = initialState, action) {
     let updatedScore = [];
 
+    console.log(action);
+
     if (action.type === INSERT) {
         updatedScore = [
             ...state,
             {
                 id: state[state.length - 1].id + 1,
-                value: 0
+                score: 0
             }
         ];
     } else {
@@ -71,17 +89,14 @@ function scoreReducer(state = initialState, action) {
                 } else if (action.type === DECREMENT) {
                     return {
                         ...s,
+                        // validating decrement operation here
                         score: s.score < action.payload.value ? 0 : s.score - action.payload.value
                     };
                 } else {
-                    return {
-                        ...s
-                    };
+                    return { ...s };
                 }
             } else {
-                return {
-                    ...s
-                };
+                return { ...s };
             }
         });
     }
@@ -95,9 +110,11 @@ const store = Redux.createStore(scoreReducer);
 // create render to render DOM element manually
 const render = () => {
     const state = store.getState();
-    singleScoreEl[0].innerHTML = state[0].score;
+
+    // dynamically assigning values from state
+    singleScoreEl.forEach((elem, i) => elem.innerHTML = state[i].score);
+
     matchCounter = state.length + 1;
-    console.log(state.length);
 }
 
 // update UI initially
@@ -107,17 +124,8 @@ render();
 store.subscribe(render);
 
 // handling event listeners here
-incrementFormEl[0].addEventListener('submit', (e) => {
-    e.preventDefault();
-    store.dispatch(increment(parseInt(e.target.increment.value)));
-    e.target.reset();
-});
-
-decrementFormEl[0].addEventListener('submit', (e) => {
-    e.preventDefault();
-    store.dispatch(decrement(parseInt(e.target.decrement.value)));
-    e.target.reset();
-});
+addFormEventListener(1, incrementFormEl[0], INCREMENT);
+addFormEventListener(1, decrementFormEl[0], DECREMENT);
 
 // adding new match here
 addAnotherMatchBtn.addEventListener('click', () => {
@@ -152,5 +160,10 @@ addAnotherMatchBtn.addEventListener('click', () => {
     incrementFormEl = document.querySelectorAll('.incrementForm');
     decrementFormEl = document.querySelectorAll('.decrementForm');
 
+    // adding event listeners to new children
+    addFormEventListener(incrementFormEl.length, incrementFormEl[incrementFormEl.length - 1], INCREMENT);
+    addFormEventListener(decrementFormEl.length, decrementFormEl[decrementFormEl.length - 1], DECREMENT);
+
+    // dispatching insertion action
     store.dispatch(insert());
 });

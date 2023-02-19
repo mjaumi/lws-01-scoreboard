@@ -5,11 +5,13 @@ let decrementFormEl = document.querySelectorAll('.decrementForm');
 
 const matchContainerEl = document.getElementById('matchContainer');
 const addAnotherMatchBtn = document.getElementById('addNewMatch');
+const resetBtn = document.getElementById('resetScore');
 
 // action identifiers
 const INCREMENT = 'increment';
 const DECREMENT = 'decrement';
 const INSERT = 'insert';
+const RESET = 'reset';
 
 let matchCounter;
 
@@ -17,8 +19,6 @@ let matchCounter;
 const addFormEventListener = (index, element, incOrDec) => {
     element.addEventListener('submit', (e) => {
         e.preventDefault();
-
-        //console.log(index, e.target.increment.value);
 
         if (incOrDec === INCREMENT) {
             store.dispatch(increment(index, parseInt(e.target.increment.value)));
@@ -29,7 +29,7 @@ const addFormEventListener = (index, element, incOrDec) => {
     });
 }
 
-// action creators
+// action creator for increment action
 const increment = (id, value) => {
     return {
         type: INCREMENT,
@@ -40,6 +40,7 @@ const increment = (id, value) => {
     };
 }
 
+// action creator for decrement action
 const decrement = (id, value) => {
     return {
         type: DECREMENT,
@@ -50,9 +51,17 @@ const decrement = (id, value) => {
     };
 }
 
+// action creator for insertion action
 const insert = () => {
     return {
         type: INSERT,
+    };
+}
+
+// action creator for reset action
+const reset = () => {
+    return {
+        type: RESET,
     };
 }
 
@@ -68,8 +77,6 @@ const initialState = [
 function scoreReducer(state = initialState, action) {
     let updatedScore = [];
 
-    console.log(action);
-
     if (action.type === INSERT) {
         updatedScore = [
             ...state,
@@ -78,8 +85,15 @@ function scoreReducer(state = initialState, action) {
                 score: 0
             }
         ];
+    } else if (action.type === RESET) {
+        updatedScore = state.map(s => {
+            return {
+                ...s,
+                score: 0
+            }
+        });
     } else {
-        updatedScore = state.map((s) => {
+        updatedScore = state.map(s => {
             if (s.id === action?.payload?.id) {
                 if (action.type === INCREMENT) {
                     return {
@@ -166,4 +180,9 @@ addAnotherMatchBtn.addEventListener('click', () => {
 
     // dispatching insertion action
     store.dispatch(insert());
+});
+
+// resetting score here by dispatching reset action
+resetBtn.addEventListener('click', () => {
+    store.dispatch(reset());
 });
